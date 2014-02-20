@@ -9,14 +9,14 @@ using NUnit.Framework;
 namespace TestCompositePattern
 {
     [TestFixture]
-    public class UnitTest1
+    public class MainTest
     {
-        private Person _party;
+        private Person _person;
 
         [TestFixtureSetUp]
         public void Startup()
         {
-            _party = new Person();
+            _person = new Person();
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace TestCompositePattern
             //---------------Execute Test ----------------------
             
             //---------------Test Result -----------------------
-            Assert.IsNotNull(_party);
+            Assert.IsNotNull(_person);
         }
 
         [Test]
@@ -40,9 +40,9 @@ namespace TestCompositePattern
             //---------------Assert Precondition----------------
 
             //---------------Execute Test ----------------------
-            _party.Name = name;
+            _person.Name = name;
             //---------------Test Result -----------------------
-            Assert.AreEqual("Test",_party.Name);
+            Assert.AreEqual("Test",_person.Name);
         }
 
         [Test]
@@ -53,9 +53,9 @@ namespace TestCompositePattern
             //---------------Assert Precondition----------------
 
             //---------------Execute Test ----------------------
-            _party.Gold = gold;
+            _person.Gold = gold;
             //---------------Test Result -----------------------
-            Assert.AreEqual(500,_party.Gold);
+            Assert.AreEqual(500,_person.Gold);
         }
 
         [Test]
@@ -79,7 +79,7 @@ namespace TestCompositePattern
             //---------------Assert Precondition----------------
 
             //---------------Execute Test ----------------------
-            group.Add(_party);
+            group.Add(_person);
             //---------------Test Result -----------------------
             Assert.IsTrue(group.Size > 0);
         }
@@ -124,13 +124,13 @@ namespace TestCompositePattern
         public void GetGoldPerPerson_GivenLayeredGroups_ShouldReturnIndividualAmounts()
         {
             //---------------Set up test pack-------------------
-            IParty steve = new Person() {Name = "Steve"};
-            IParty dan = new Person() {Name = "Dan"};
-            IParty matt = new Person() {Name = "Matt"};
-            IParty bob1 = new Person() {Name = "Bob1"};
-            IParty bob2 = new Person() {Name = "Bob2"};
-            IParty julia = new Person() {Name = "Julia"};
-            IParty james = new Person() {Name = "James"};
+            var steve = new Person() { Name = "Steve" };
+            var dan = new Person() { Name = "Dan" };
+            var matt = new Person() { Name = "Matt" };
+            var bob1 = new Person() { Name = "Bob1" };
+            var bob2 = new Person() { Name = "Bob2" };
+            var julia = new Person() { Name = "Julia" };
+            var james = new Person() { Name = "James" };
             
             var group = new MyGroup();
             group.Name = "Devs";
@@ -165,13 +165,14 @@ namespace TestCompositePattern
 
     public class MyGroup : IParty
     {
-        public void Add(IParty person)
-        {
-            this.Parties.Add(person);
-        }
-
+        public string Name { get; set; }
         public List<IParty> Parties = new List<IParty>();
         private int _gold;
+
+        public void Add(IParty person)
+        {
+            Parties.Add(person);
+        }
 
         public int Size
         {
@@ -187,39 +188,19 @@ namespace TestCompositePattern
             set
             {
                 _gold = value;
-                int goldToSplit = _gold/Parties.Count;
-                int goldLeftOver = _gold%Parties.Count;
-                foreach (var person in Parties)
-                {
-                    person.Gold = goldToSplit + goldLeftOver;
-                    goldLeftOver = 0;
-                }
+                AssignGoldToPersons();
             }
-            
         }
 
-        public string Name { get; set; }
-    }
-
-    public interface IParty
-    {
-        int Gold { get; set; }
-        string Name { get; set; }
-
-        void Add(IParty party);
-
-    }
-
-    public class Person : IParty
-    {
-        public string Name { get; set; }
-        public void Add(IParty party)
+        private void AssignGoldToPersons()
         {
-            Parties.Add(party);
+            int goldToSplit = _gold/Parties.Count;
+            int goldLeftOver = _gold%Parties.Count;
+            foreach (var person in Parties)
+            {
+                person.Gold = goldToSplit + goldLeftOver;
+                goldLeftOver = 0;
+            }
         }
-
-        public List<IParty> Parties { get; set; }
-
-        public int Gold { get; set; }
     }
 }
